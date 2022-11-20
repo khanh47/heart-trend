@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <html>
   <head>
-    <title>Trí Tuệ Trạng Lường</title>
+    <title>THPT chuyên Lương Thế Vinh</title>
     <meta name="Generator" content="EditPlus" />
     <meta name="Author" content="" />
     <meta name="Keywords" content="" />
@@ -13,7 +13,7 @@
         height: 100%;
         padding: 0;
         margin: 0;
-        background: #000;
+        background: rgb(255, 255, 255);
       }
 
       .box {
@@ -108,14 +108,11 @@
   </head>
 
   <body>
-    <img class="logo" width="150" src="logoTTTL.png" alt="" />
+    <img class="logo" src="logoLTV.png" alt="" />
     <div class="box">
       <canvas id="pinkboard"></canvas>
     </div>
     <script>
-      /*
-       * Settings
-       */
       var settings = {
         particles: {
           length: 2000, // maximum amount of particles
@@ -125,9 +122,7 @@
           size: 13, // particle size in pixels
         },
       };
-      /*
-       * RequestAnimationFrame polyfill by Erik Möller
-       */
+
       (function () {
         var b = 0;
         var c = ["ms", "moz", "webkit", "o"];
@@ -154,9 +149,7 @@
           };
         }
       })();
-      /*
-       * Point class
-       */
+
       var Point = (function () {
         function Point(x, y) {
           this.x = typeof x !== "undefined" ? x : 0;
@@ -181,9 +174,7 @@
         };
         return Point;
       })();
-      /*
-       * Particle class
-       */
+
       var Particle = (function () {
         function Particle() {
           this.position = new Point();
@@ -223,9 +214,7 @@
         };
         return Particle;
       })();
-      /*
-       * ParticlePool class
-       */
+
       var ParticlePool = (function () {
         var particles,
           firstActive = 0,
@@ -241,7 +230,6 @@
         ParticlePool.prototype.add = function (x, y, dx, dy) {
           particles[firstFree].initialize(x, y, dx, dy);
 
-          // handle circular queue
           firstFree++;
           if (firstFree == particles.length) firstFree = 0;
           if (firstActive == firstFree) firstActive++;
@@ -250,7 +238,6 @@
         ParticlePool.prototype.update = function (deltaTime) {
           var i;
 
-          // update active particles
           if (firstActive < firstFree) {
             for (i = firstActive; i < firstFree; i++)
               particles[i].update(deltaTime);
@@ -261,7 +248,6 @@
             for (i = 0; i < firstFree; i++) particles[i].update(deltaTime);
           }
 
-          // remove inactive particles
           while (
             particles[firstActive].age >= duration &&
             firstActive != firstFree
@@ -271,7 +257,6 @@
           }
         };
         ParticlePool.prototype.draw = function (context, image) {
-          // draw active particles
           if (firstActive < firstFree) {
             for (i = firstActive; i < firstFree; i++)
               particles[i].draw(context, image);
@@ -284,9 +269,7 @@
         };
         return ParticlePool;
       })();
-      /*
-       * Putting it all together
-       */
+
       (function (canvas) {
         var context = canvas.getContext("2d"),
           particles = new ParticlePool(settings.particles.length),
@@ -294,7 +277,6 @@
             settings.particles.length / settings.particles.duration, // particles/sec
           time;
 
-        // get point on heart with -PI <= t <= PI
         function pointOnHeart(t) {
           return new Point(
             160 * Math.pow(Math.sin(t), 3),
@@ -306,13 +288,12 @@
           );
         }
 
-        // creating the particle image using a dummy canvas
         var image = (function () {
           var canvas = document.createElement("canvas"),
             context = canvas.getContext("2d");
           canvas.width = settings.particles.size;
           canvas.height = settings.particles.size;
-          // helper function to create the path
+
           function to(t) {
             var point = pointOnHeart(t);
             point.x =
@@ -323,7 +304,7 @@
               (point.y * settings.particles.size) / 350;
             return point;
           }
-          // create the path
+
           context.beginPath();
           var t = -Math.PI;
           var point = to(t);
@@ -334,29 +315,24 @@
             context.lineTo(point.x, point.y);
           }
           context.closePath();
-          // create the fill
+
           context.fillStyle = "#FF0000";
           context.fill();
-          // create the image
+
           var image = new Image();
           image.src = canvas.toDataURL();
           return image;
         })();
 
-        // render that thing!
         function render() {
-          // next animation frame
           requestAnimationFrame(render);
 
-          // update time
           var newTime = new Date().getTime() / 1000,
             deltaTime = newTime - (time || newTime);
           time = newTime;
 
-          // clear canvas
           context.clearRect(0, 0, canvas.width, canvas.height);
 
-          // create new particles
           var amount = particleRate * deltaTime;
           for (var i = 0; i < amount; i++) {
             var pos = pointOnHeart(Math.PI - 2 * Math.PI * Math.random());
@@ -369,19 +345,16 @@
             );
           }
 
-          // update and draw particles
           particles.update(deltaTime);
           particles.draw(context, image);
         }
 
-        // handle (re-)sizing of the canvas
         function onResize() {
           canvas.width = canvas.clientWidth;
           canvas.height = canvas.clientHeight;
         }
         window.onresize = onResize;
 
-        // delay rendering bootstrap
         setTimeout(function () {
           onResize();
           render();
